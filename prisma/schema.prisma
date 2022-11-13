@@ -24,15 +24,16 @@ model Account {
   provider                 String
   providerAccountId        String
   refresh_token_expires_in Int?
-  refresh_token            String?  @db.Text
-  access_token             String?  @db.Text
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
   expires_at               Int?
   token_type               String?
   scope                    String?
   id_token                 String? // @db.Text
   session_state            String?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   created_at               Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -53,7 +54,9 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  roles         String?
+  posts         Post[]
+  comments      Comment[]
+  roles         Role[]
 }
 
 model VerificationToken {
@@ -65,13 +68,52 @@ model VerificationToken {
 }
 
 model Post {
-  id String @id @unique @default(cuid())
+  id    String @id @default(cuid())
+  tags  Tag[]
+  title String
+  body  String
+  slug  String
+
+  authors User[]
+
+  comments Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Tag {
-  id String @id @unique @default(cuid())
+  id    String @id @default(cuid())
+  label String
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
-  id String @id @unique @default(cuid())
+  id   String @id @default(cuid())
+  body String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  children Comment[] @relation("comment_children")
+  parent   Comment?  @relation("comment_children", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id     String  @id @default(cuid())
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
