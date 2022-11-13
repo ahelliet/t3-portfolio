@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { User} from "next-auth";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 // Providers
 import GithubProvider from "next-auth/providers/github";
@@ -10,10 +11,20 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db/client";
+import type { AdapterUser } from "next-auth/adapters.js";
 
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
   callbacks: {
+    signIn: async (params: {
+      user: User | AdapterUser
+      profile?: any
+    }) => {
+      if (params.user.image === null) {
+        await prisma.user.update({ data: { image: params.profile!.avatar_url }, where: { email: params.user.email! } })
+      }
+      return true;
+    },
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
