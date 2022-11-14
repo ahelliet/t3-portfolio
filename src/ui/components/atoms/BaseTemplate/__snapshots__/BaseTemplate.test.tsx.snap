@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/Example Component is not null 1`] = `
+<div>
+  <div
+    class="BaseTemplate"
+  >
+    This is a test text.
+  </div>
+</div>
+`;
