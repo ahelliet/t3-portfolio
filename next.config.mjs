@@ -9,9 +9,10 @@
 const config = {
   reactStrictMode: true,
   swcMinify: true,
+  pageExtensions: ["page.tsx", "page.ts", "api.ts", "api.tsx"],
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+    locales: ["fr"],
+    defaultLocale: "fr",
   },
 };
 export default config;
